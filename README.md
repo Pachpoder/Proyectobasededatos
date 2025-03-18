@@ -57,7 +57,7 @@ Se crearon procedimientos para gestionar eficientemente la base de datos:
 
 ---
 
-## Faltante para Completar el Proyecto
+## Faltante para Completar el Proyecto FASE II
 
 1. **Interfaz de Usuario:**
    - Desarrollo de una aplicación web para la gestión del inventario.
