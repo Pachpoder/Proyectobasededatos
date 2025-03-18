@@ -1,5 +1,11 @@
 # Proyecto: Sistema de Gestión de Inventarios
 
+Integrantes
+OSCAR DANIEL ORTIZ VALENZUELA - 24000468
+EDGAR ARTURO JIMÉNEZ CENTENO- 19001704
+ANDRES OVANDO MORALES - 24000581
+DINA MORALES RIVERA - 24000205
+
 ## Fase 1: Implementación de la Base de Datos
 
 ### **Objetivo del Proyecto**
