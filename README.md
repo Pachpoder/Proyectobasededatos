@@ -1,5 +1,8 @@
 # Proyecto: Sistema de Gestión de Inventarios
 
+## VIDEO EXPLICATIVO DEL PROYECTO:
+https://drive.google.com/file/d/1_ZQ49K4RoBrk3e-PmOzKUoOOKnFH_Ksr/view
+
 ## Integrantes
 
 - OSCAR DANIEL ORTIZ VALENZUELA - 24000468
@@ -8,8 +11,7 @@
 - DINA MORALES RIVERA - 24000205
 
 ---
-## VIDEO EXPLICATIVO DEL PROYECTO:
-https://drive.google.com/file/d/1_ZQ49K4RoBrk3e-PmOzKUoOOKnFH_Ksr/view
+
 
 ## Fase 1: Implementación de la Base de Datos
 
