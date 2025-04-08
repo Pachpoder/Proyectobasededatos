@@ -9,7 +9,7 @@
 
 ---
 ## VIDEO EXPLICATIVO DEL PROYECTO:
-https://docs.google.com/document/d/1Sg1J_chLdKPQmi60PZWGJvLiafOgdrvQwVoD0s43Fr8/edit?tab=t.0
+https://drive.google.com/file/d/1_ZQ49K4RoBrk3e-PmOzKUoOOKnFH_Ksr/view
 
 ## Fase 1: Implementación de la Base de Datos
 
