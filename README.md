@@ -1,14 +1,11 @@
-Proyecto: Sistema de Gestión de Inventarios
+# Proyecto: Sistema de Gestión de Inventarios
 
-Integrantes
+## Integrantes
 
-OSCAR DANIEL ORTIZ VALENZUELA - 24000468
-
-EDGAR ARTURO JIMÉNEZ CENTENO- 19001704
-
-ANDRES OVANDO MORALES - 24000581
-
-DINA MORALES RIVERA - 24000205
+- OSCAR DANIEL ORTIZ VALENZUELA - 24000468
+- EDGAR ARTURO JIMÉNEZ CENTENO - 19001704
+- ANDRES OVANDO MORALES - 24000581
+- DINA MORALES RIVERA - 24000205
 
 ---
 
@@ -110,12 +107,12 @@ GROUP BY p.nombre;
 ```
 
 ### 3. Gestión de Usuarios y Seguridad (15 puntos)
-
 Se crearon y probaron las siguientes funcionalidades:
 - Tabla de usuarios, roles y permisos.
 - Se insertaron usuarios y se asignaron permisos por rol.
 - Se actualizó el rol de un usuario y se eliminó otro.
-- Pruebas realizadas:
+
+#### Pruebas realizadas:
 ```sql
 CALL agregar_usuario(...);
 CALL asignar_permiso(...);
@@ -123,30 +120,28 @@ CALL listar_usuarios_roles();
 CALL actualizar_rol_usuario(...);
 CALL eliminar_usuario(...);
 ```
-4. Conexión a MongoDB Atlas y Endpoints para Datos Históricos
-Se implementó una API REST con Node.js y Express conectada a MongoDB Atlas, usada para almacenar datos históricos del sistema. Esta parte representa la integración NoSQL del proyecto.
 
-Funcionalidades implementadas:
-POST /api/transacciones y GET /api/transacciones
-→ Registra y consulta transacciones pasadas.
+### 4. Conexión a MongoDB Atlas y Endpoints para Datos Históricos
 
-POST /api/historial y GET /api/historial
-→ Guarda y recupera cambios realizados a productos.
+Se implementó una API REST con **Node.js y Express** conectada a **MongoDB Atlas**, utilizada para almacenar datos históricos relacionados con el sistema de inventarios. Esta parte representa la integración de una base de datos **NoSQL** en el proyecto.
 
-POST /api/comentarios y GET /api/comentarios
-→ Permite registrar y consultar comentarios de operadores.
+#### Funcionalidades implementadas:
+- `POST /api/transacciones` y `GET /api/transacciones`  
+  → Registro y consulta de transacciones históricas.
 
-Tecnología utilizada:
-MongoDB Atlas (nube)
+- `POST /api/historial` y `GET /api/historial`  
+  → Registro y recuperación de cambios realizados a productos.
 
-Mongoose + Node.js
+- `POST /api/comentarios` y `GET /api/comentarios`  
+  → Registro y consulta de observaciones hechas por operadores.
 
-Postman (para pruebas)
+#### Tecnologías utilizadas:
+- **MongoDB Atlas** (nube)  
+- **Node.js + Express + Mongoose**  
+- **Postman** para pruebas
 
-Los datos enviados desde Postman se almacenan directamente en la base inventario-db en MongoDB Atlas, validando el correcto funcionamiento de la API NoSQL.
+Los datos enviados desde Postman se almacenan directamente en la base de datos **`inventario-db`** alojada en MongoDB Atlas, lo que demuestra el correcto funcionamiento de la API y la conexión en la nube.
+
 ---
 
 ✅ **Fase 2 completada exitosamente. Proyecto finalizado.**
-
-
-
