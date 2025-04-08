@@ -8,6 +8,8 @@
 - DINA MORALES RIVERA - 24000205
 
 ---
+## VIDEO EXPLICATIVO DEL PROYECTO:
+https://docs.google.com/document/d/1Sg1J_chLdKPQmi60PZWGJvLiafOgdrvQwVoD0s43Fr8/edit?tab=t.0
 
 ## Fase 1: Implementación de la Base de Datos
 
