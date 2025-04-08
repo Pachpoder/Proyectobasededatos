@@ -123,7 +123,27 @@ CALL listar_usuarios_roles();
 CALL actualizar_rol_usuario(...);
 CALL eliminar_usuario(...);
 ```
+4. Conexión a MongoDB Atlas y Endpoints para Datos Históricos
+Se implementó una API REST con Node.js y Express conectada a MongoDB Atlas, usada para almacenar datos históricos del sistema. Esta parte representa la integración NoSQL del proyecto.
 
+Funcionalidades implementadas:
+POST /api/transacciones y GET /api/transacciones
+→ Registra y consulta transacciones pasadas.
+
+POST /api/historial y GET /api/historial
+→ Guarda y recupera cambios realizados a productos.
+
+POST /api/comentarios y GET /api/comentarios
+→ Permite registrar y consultar comentarios de operadores.
+
+Tecnología utilizada:
+MongoDB Atlas (nube)
+
+Mongoose + Node.js
+
+Postman (para pruebas)
+
+Los datos enviados desde Postman se almacenan directamente en la base inventario-db en MongoDB Atlas, validando el correcto funcionamiento de la API NoSQL.
 ---
 
 ✅ **Fase 2 completada exitosamente. Proyecto finalizado.**
