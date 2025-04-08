@@ -1,15 +1,15 @@
--- Crear la base de datos
-CREATE DATABASE IF NOT EXISTS gestion_inventarios;
+-- LIMPIAR Y CREAR BASE DE DATOS
+DROP DATABASE IF EXISTS gestion_inventarios;
+CREATE DATABASE gestion_inventarios;
 USE gestion_inventarios;
 
--- Tabla de almacenes
+-- TABLAS PRINCIPALES
 CREATE TABLE almacenes (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     direccion TEXT NOT NULL
 );
 
--- Tabla de ubicaciones dentro de almacenes
 CREATE TABLE ubicaciones (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_almacen BIGINT NOT NULL,
@@ -17,7 +17,6 @@ CREATE TABLE ubicaciones (
     FOREIGN KEY (id_almacen) REFERENCES almacenes(id) ON DELETE CASCADE
 );
 
--- Tabla de productos
 CREATE TABLE productos (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(50) UNIQUE NOT NULL,
@@ -29,7 +28,6 @@ CREATE TABLE productos (
     FOREIGN KEY (id_ubicacion) REFERENCES ubicaciones(id) ON DELETE CASCADE
 );
 
--- Tabla de transacciones (ventas simuladas)
 CREATE TABLE transacciones (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_producto BIGINT NOT NULL,
@@ -39,7 +37,6 @@ CREATE TABLE transacciones (
     FOREIGN KEY (id_producto) REFERENCES productos(id) ON DELETE CASCADE
 );
 
--- Tabla de usuarios
 CREATE TABLE usuarios (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
@@ -48,13 +45,11 @@ CREATE TABLE usuarios (
     id_rol BIGINT NOT NULL
 );
 
--- Tabla de roles
 CREATE TABLE roles (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE
 );
 
--- Tabla de permisos
 CREATE TABLE permisos (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_rol BIGINT NOT NULL,
@@ -62,7 +57,6 @@ CREATE TABLE permisos (
     FOREIGN KEY (id_rol) REFERENCES roles(id) ON DELETE CASCADE
 );
 
--- Tabla de historial de cambios de productos
 CREATE TABLE historial_cambios (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_producto BIGINT NOT NULL,
@@ -71,7 +65,6 @@ CREATE TABLE historial_cambios (
     FOREIGN KEY (id_producto) REFERENCES productos(id) ON DELETE CASCADE
 );
 
--- Tabla de comentarios sobre productos
 CREATE TABLE comentarios_productos (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_producto BIGINT NOT NULL,
@@ -82,11 +75,25 @@ CREATE TABLE comentarios_productos (
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
--- Insertar roles por defecto
+-- PARTICIÓN VERTICAL
+CREATE TABLE productos_detalle (
+    id BIGINT PRIMARY KEY,
+    descripcion TEXT,
+    id_ubicacion BIGINT NOT NULL,
+    FOREIGN KEY (id) REFERENCES productos(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_ubicacion) REFERENCES ubicaciones(id) ON DELETE CASCADE
+);
+
+-- PARTICIÓN HORIZONTAL
+CREATE TABLE productos_almacen1 LIKE productos;
+CREATE TABLE productos_almacen2 LIKE productos;
+
+-- DATOS INICIALES
 INSERT INTO roles (nombre) VALUES ('Administrador'), ('Operador');
 
--- Procedimiento para agregar productos
+-- PROCEDIMIENTOS
 DELIMITER $$
+
 CREATE PROCEDURE agregar_producto (
     IN p_codigo VARCHAR(50),
     IN p_nombre VARCHAR(255),
@@ -99,10 +106,7 @@ BEGIN
     INSERT INTO productos (codigo, nombre, descripcion, precio, stock, id_ubicacion)
     VALUES (p_codigo, p_nombre, p_descripcion, p_precio, p_stock, p_id_ubicacion);
 END$$
-DELIMITER ;
 
--- Procedimiento para actualizar el stock de un producto
-DELIMITER $$
 CREATE PROCEDURE actualizar_stock (
     IN p_id_producto BIGINT,
     IN p_nuevo_stock INT
@@ -110,10 +114,7 @@ CREATE PROCEDURE actualizar_stock (
 BEGIN
     UPDATE productos SET stock = p_nuevo_stock WHERE id = p_id_producto;
 END$$
-DELIMITER ;
 
--- Procedimiento para registrar una venta
-DELIMITER $$
 CREATE PROCEDURE registrar_venta (
     IN p_id_producto BIGINT,
     IN p_cantidad INT
@@ -125,48 +126,7 @@ BEGIN
     VALUES (p_id_producto, p_cantidad, v_precio * p_cantidad);
     UPDATE productos SET stock = stock - p_cantidad WHERE id = p_id_producto;
 END$$
-DELIMITER ;
 
--- Trigger para evitar stock negativo
-DELIMITER $$
-CREATE TRIGGER before_venta_insert
-BEFORE INSERT ON transacciones
-FOR EACH ROW
-BEGIN
-    DECLARE v_stock INT;
-    SELECT stock INTO v_stock FROM productos WHERE id = NEW.id_producto;
-    IF v_stock < NEW.cantidad THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Stock insuficiente';
-    END IF;
-END$$
-DELIMITER ;
-
--- Trigger para registrar eliminación de productos en historial
-DELIMITER $$
-CREATE TRIGGER after_producto_delete
-AFTER DELETE ON productos
-FOR EACH ROW
-BEGIN
-    INSERT INTO historial_cambios (id_producto, cambio)
-    VALUES (OLD.id, 'Producto eliminado');
-END$$
-DELIMITER ;
-
--- Función para calcular el valor total del inventario
-DELIMITER $$
-CREATE FUNCTION calcular_valor_total_inventario()
-RETURNS DECIMAL(10,2)
-DETERMINISTIC
-BEGIN
-    DECLARE total DECIMAL(10,2);
-    SELECT SUM(precio * stock) INTO total FROM productos;
-    RETURN total;
-END$$
-DELIMITER ;
-
-
--- Procedimiento para agregar usuarios
-DELIMITER $$
 CREATE PROCEDURE agregar_usuario (
     IN p_nombre VARCHAR(255),
     IN p_email VARCHAR(255),
@@ -177,10 +137,7 @@ BEGIN
     INSERT INTO usuarios (nombre, email, password_hash, id_rol)
     VALUES (p_nombre, p_email, p_password_hash, p_id_rol);
 END$$
-DELIMITER ;
 
--- Procedimiento para actualizar el rol de un usuario
-DELIMITER $$
 CREATE PROCEDURE actualizar_rol_usuario (
     IN p_id_usuario BIGINT,
     IN p_nuevo_id_rol BIGINT
@@ -188,29 +145,20 @@ CREATE PROCEDURE actualizar_rol_usuario (
 BEGIN
     UPDATE usuarios SET id_rol = p_nuevo_id_rol WHERE id = p_id_usuario;
 END$$
-DELIMITER ;
 
--- Procedimiento para eliminar un usuario
-DELIMITER $$
 CREATE PROCEDURE eliminar_usuario (
     IN p_id_usuario BIGINT
 )
 BEGIN
     DELETE FROM usuarios WHERE id = p_id_usuario;
 END$$
-DELIMITER ;
 
--- Procedimiento para listar usuarios y sus roles
-DELIMITER $$
 CREATE PROCEDURE listar_usuarios_roles()
 BEGIN
     SELECT u.id, u.nombre, u.email, r.nombre AS rol FROM usuarios u
     JOIN roles r ON u.id_rol = r.id;
 END$$
-DELIMITER ;
 
--- Procedimiento para asignar un permiso a un rol
-DELIMITER $$
 CREATE PROCEDURE asignar_permiso (
     IN p_id_rol BIGINT,
     IN p_permiso VARCHAR(100)
@@ -218,20 +166,14 @@ CREATE PROCEDURE asignar_permiso (
 BEGIN
     INSERT INTO permisos (id_rol, permiso) VALUES (p_id_rol, p_permiso);
 END$$
-DELIMITER ;
 
-Reportes Generales
--- Reporte de inventario general
-DELIMITER $$
+-- REPORTES
 CREATE PROCEDURE reporte_inventario_general()
 BEGIN
     SELECT p.codigo, p.nombre, p.stock, p.precio, (p.stock * p.precio) AS valor_total
     FROM productos p;
 END$$
-DELIMITER ;
 
--- Reporte de productos por ubicación
-DELIMITER $$
 CREATE PROCEDURE reporte_productos_por_ubicacion()
 BEGIN
     SELECT a.nombre AS almacen, u.nombre AS ubicacion, p.nombre AS producto, p.stock
@@ -240,11 +182,7 @@ BEGIN
     JOIN almacenes a ON u.id_almacen = a.id
     ORDER BY a.nombre, u.nombre;
 END$$
-DELIMITER ;
 
-
--- Reporte de ventas simuladas
-DELIMITER $$
 CREATE PROCEDURE reporte_ventas_simuladas()
 BEGIN
     SELECT t.id, p.nombre AS producto, t.cantidad, t.fecha, t.total
@@ -252,10 +190,7 @@ BEGIN
     JOIN productos p ON t.id_producto = p.id
     ORDER BY t.fecha DESC;
 END$$
-DELIMITER ;
 
--- Reporte de productos con bajo stock
-DELIMITER $$
 CREATE PROCEDURE reporte_productos_bajo_stock(IN nivel_minimo INT)
 BEGIN
     SELECT p.codigo, p.nombre, p.stock
@@ -263,15 +198,55 @@ BEGIN
     WHERE p.stock < nivel_minimo
     ORDER BY p.stock ASC;
 END$$
-DELIMITER ;
 
--- Reporte de usuarios y sus roles
-DELIMITER $$
 CREATE PROCEDURE reporte_usuarios_roles()
 BEGIN
     SELECT u.id, u.nombre, u.email, r.nombre AS rol
     FROM usuarios u
     JOIN roles r ON u.id_rol = r.id;
 END$$
+
+-- FUNCIONES
+CREATE FUNCTION calcular_valor_total_inventario()
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+BEGIN
+    DECLARE total DECIMAL(10,2);
+    SELECT SUM(precio * stock) INTO total FROM productos;
+    RETURN total;
+END$$
+
+-- TRIGGERS
+CREATE TRIGGER before_venta_inserta
+BEFORE INSERT ON transacciones
+FOR EACH ROW
+BEGIN
+    DECLARE v_stock INT;
+    SELECT stock INTO v_stock FROM productos WHERE id = NEW.id_producto;
+    IF v_stock < NEW.cantidad THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Stock insuficiente';
+    END IF;
+END$$
+
+CREATE TRIGGER after_producto_delete
+AFTER DELETE ON productos
+FOR EACH ROW
+BEGIN
+    INSERT INTO historial_cambios (id_producto, cambio)
+    VALUES (OLD.id, 'Producto eliminado');
+END$$
+
 DELIMITER ;
 
+-- VISTAS
+CREATE VIEW vista_productos_por_ubicacion AS
+SELECT a.nombre AS nombre_almacen, u.nombre AS nombre_ubicacion, p.nombre AS nombre_producto, p.stock
+FROM productos p
+JOIN ubicaciones u ON p.id_ubicacion = u.id
+JOIN almacenes a ON u.id_almacen = a.id;
+
+CREATE VIEW vista_resumen_ventas AS
+SELECT p.nombre AS producto, COUNT(t.id) AS total_transacciones, SUM(t.cantidad) AS total_vendido, SUM(t.total) AS ingresos_totales
+FROM transacciones t
+JOIN productos p ON t.id_producto = p.id
+GROUP BY p.nombre;
